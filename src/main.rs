@@ -1,5 +1,9 @@
-use std::io::{self, Write};
 use rand::Rng;
+use std::io::{self, Write};
+
+fn colored(r: i32, g: i32, b: i32, text: &str) -> String {
+    format!("\x1B[38;2;{};{};{}m{}\x1B[0m", r, g, b, text)
+}
 
 fn main() {
     println!("Welcome to the guessing game! I will think of a number in the range [1, 100] and you'll try to guess it");
@@ -18,12 +22,15 @@ fn main() {
             .and_then(|input| input.trim().parse::<i8>().ok())
         {
             Some(guess) if !(1..=100).contains(&guess) => {
-                println!("Guess should be in the range [1, 100]");
+                println!(
+                    "{}",
+                    colored(255, 255, 0, "Guess should be in the range [1, 100]")
+                );
                 continue;
             }
             Some(guess) => guess,
             _ => {
-                println!("Invalid guess, try again");
+                println!("{}", colored(255, 0, 0, "Invalid guess, try again"));
                 continue;
             }
         };
@@ -31,10 +38,13 @@ fn main() {
         attempts += 1;
 
         match guess.cmp(&secret) {
-            std::cmp::Ordering::Less => println!("Too low"),
-            std::cmp::Ordering::Greater => println!("Too high"),
+            std::cmp::Ordering::Less => println!("Too {}", colored(255, 255, 0, "low")),
+            std::cmp::Ordering::Greater => println!("Too {}", colored(255, 255, 0, "high")),
             std::cmp::Ordering::Equal => {
-                println!("Found it in {attempts} guesses!");
+                println!(
+                    "{}",
+                    colored(0, 255, 0, &format!("Found it in {attempts} guesses!"))
+                );
                 break;
             }
         }
